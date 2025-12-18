@@ -776,23 +776,34 @@ else:
         )
 
     col4, col5, col6 = st.columns(3)
+    if row3['SoC'] < 10000:
+        with col4:
+            st.metric(
+                "Base Generation",
+                f"{row3['base'] + (row1 - row):.0f} MW"
+            )
 
-    with col4:
-        st.metric(
-            "Base Generation",
-            f"{row3['base']:.0f} MW"
-        )
-
-    with col5:
-        st.metric(
-            "Powerflow in Storage",
-            f"{row3['SS']:.0f} MW"
-        )
+        with col5:
+            st.metric(
+                "Powerflow in Storage",
+                f"{row3['SS']:.0f} MW"
+            )
+    else:
+        with col4:
+            st.metric(
+                "Base Generation",
+                f"{row3['base'] + (row1 - row) - row3['SS']:.0f} MW"
+            )
+        with col5:
+            st.metric(
+                "Powerflow in Storage",
+                f"{0:.0f} MW"
+            )
 
     with col6:
         st.metric(
             "SoC",
-            f"{row3['SoC']:.0f} MWh"
+            f"{row3['SoC']*100/10000:.0f} %"
         )
 
 
@@ -820,17 +831,23 @@ st.subheader("🔋 Storage Flow & SoC")
 fig2 = go.Figure()
 
 # Energy Flow (SS)
+ss = []
+for i in range(24*4):
+    if day_X2['SoC'].iloc[i] < 10000:
+       ss.append(-day_X2['SS'].iloc[i])
+    else: ss.append(0)
+
 fig2.add_trace(go.Bar(
     x=day_X2.index,
-    y=-day_X2['SS'],
+    y=ss,
     name="Storage Flow (charge−, discharge+)"
 ))
 
 # SoC Line
 fig2.add_trace(go.Scatter(
     x=day_X2.index,
-    y=day_X2['SoC'],
-    name="State of Charge (kWh)",
+    y=day_X2['SoC']*100/10000,
+    name="State of Charge %",
     yaxis="y2",
 ))
 
@@ -847,7 +864,7 @@ fig2.update_layout(
     xaxis=dict(title="Time"),
     yaxis=dict(title="Flow (MW)"),
     yaxis2=dict(
-        title="SoC (MWh)",
+        title="%SoC",
         overlaying='y',
         side='right'
     )

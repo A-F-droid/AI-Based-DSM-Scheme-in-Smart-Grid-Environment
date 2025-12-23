@@ -570,7 +570,7 @@ st.caption(
 
 
 
-st.title("⚡ Austria Load Forecast Dashboard")
+st.title("⚡ DSM Dashboard")
 st.markdown("An interactive interface for **load forecasting, storage flow, and base load analysis**.")
 
 
@@ -642,10 +642,10 @@ if (selected_day != all_days[-1]):
         st.metric("🌧 Precipitation", f"{day_weather['rr'].sum():.1f} mm")
 
     with col3:
-        st.metric("☀ Sunshine", f"{day_weather['so_h'].sum():.1f} min")
+        st.metric("☀ Sunshine", f"{day_weather['so_h'].sum()/4:.1f} hour")
     
     with col4:
-        st.metric("🌬 Wind Speed", f"{day_weather['ff'].sum():.1f} min")
+        st.metric("🌬 Average Wind Speed", f"{day_weather['ff'].mean():.1f} m/s")
 
     with col5:
         cond = "☀ Clear" if day_weather["so_h"].mean() > 50 else "☁ Cloudy"
@@ -726,10 +726,10 @@ if (selected_day != all_days[-1]):
        st.metric("⏻ Load", f"{day_actual.sum():.1f} MWh", f"{day_pred.sum():.1f} MWh(forcasted)")
 
     with col2:
-        st.metric("☀ PV Generation", f"{re_gen['Solar'].sum():.1f} MWh")
+        st.metric("☀ PV Generation", f"{re_gen['Solar'].sum()/1000:.1f} MWh")
 
     with col3:
-        st.metric("🌬 Wind Generation", f"{re_gen['Wind Onshore'].sum():.1f} MWh")
+        st.metric("🌬 Wind Generation", f"{re_gen['Wind Onshore'].sum()/1000:.1f} MWh")
     
     with col4:
         st.metric("Base Generation", f"{X2['base'].mean():.1f} MW")
@@ -852,7 +852,7 @@ fig2.add_trace(go.Scatter(
 ))
 
 fig2.add_trace(go.Scatter(
-    x=day_pred.index, y=day_X2['peak_curve'], mode='lines', name='Forecasted Load', line=dict(width=2), yaxis='y1'
+    x=day_pred.index, y=day_X2['peak_curve'], mode='lines', name='Forecasted Load - Base Gen', line=dict(width=2), yaxis='y1'
 ))
 
 fig2.add_trace(go.Scatter(
